@@ -50,3 +50,8 @@ class HTTPClient:
             headers=headers,
             **kwargs,
         )
+
+
+
+if __name__ == "__main__":
+    print(PROTOCOL + "://" + URL + PATH.get(2) + LANG.get("ja"))
