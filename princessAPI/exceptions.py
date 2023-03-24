@@ -1,0 +1,3 @@
+
+class PrincessException(Exception):
+    pass
