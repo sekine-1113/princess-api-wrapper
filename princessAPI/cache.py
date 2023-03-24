@@ -26,6 +26,9 @@ class StaticCache(Cache):
     def set(self, key, value):
         self.cache[key] = value
 
+    def clear(self):
+        self.cache.clear()
+
 
 
 if __name__ == "__main__":
