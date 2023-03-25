@@ -2,10 +2,10 @@ import setuptools
 
 
 setuptools.setup(
-    name="princess",
-    version="1.2.2",
+    name="princessAPI",
+    version="2.0.0",
     description="アイドルマスターミリオンライブ!シアターデイズのAPI(PrincessAPI)のPythonラッパー",
-    author="Sekine Toshiaki",
+    author="Share Nakatani",
     packages=setuptools.find_packages(),
     install_requires=["cachetools", "requests"]
 )
