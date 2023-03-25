@@ -10,7 +10,7 @@ class Cache(ABC):
         ...
 
     @abstractmethod
-    def set(self, key, value):
+    def store(self, key, value):
         ...
 
 
@@ -23,7 +23,7 @@ class StaticCache(Cache):
         data = self.cache.get(key)
         return data
 
-    def set(self, key, value):
+    def store(self, key, value):
         self.cache[key] = value
 
     def clear(self):
