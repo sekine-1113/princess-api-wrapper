@@ -7,7 +7,9 @@ from princessAPI.consts import (
 )
 
 
-
 api = API()
-api.get_cards(idolId=30)
+for card in api.get_cards(idolId=30, rarity=CardRarity.SSR, exType=ExType.SHS):
+    print(card["name"])
+
+
 
