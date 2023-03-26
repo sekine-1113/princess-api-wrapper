@@ -51,3 +51,9 @@ class EventType(IntEnum):
     Tale = 13
     Talkparty = 14
     Treasure = 16
+
+
+class Lang:
+    Japanese = "ja"
+    Korean = "ko"
+    Chinese = "zh"
