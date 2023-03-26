@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from princessAPI.api import API
 from princessAPI.consts import (
+    Lang,
     IdolType,
     CardRarity,
     ExType,

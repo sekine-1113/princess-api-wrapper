@@ -34,7 +34,7 @@ class API:
     ```
     """
     def __init__(
-        self, cache: Cache=None, host: str='api.matsurihi.me', lang: str=None, use_etag: bool=True,
+        self, cache: Cache=None, host: str='api.matsurihi.me', lang: str=None, use_etag: bool=False,
         retry_count: int=0, retry_delay: int=0, user_agent: str=None, timeout: int=60,
     ) -> None:
         self.cache = cache or StaticCache(32, 900)
@@ -58,7 +58,7 @@ class API:
 
     def request(
         self, method: str, endpoint: str, *, endpoint_parameters: tuple=(),
-        params: dict=None, headers: dict=None, use_cache: bool=True, use_etag: bool=True, **kwargs
+        params: dict=None, headers: dict=None, use_cache: bool=True, use_etag: bool=False, **kwargs
     ) -> requests.Response:
 
         self.cached_result = False
@@ -82,8 +82,8 @@ class API:
             if k not in endpoint_parameters:
                 log.warning(f'Unexpected parameter: {k}')
             if k == "orderBy":
-                if not (arg in "id | sortId | rarity | idolId | addedAt | id! | sortId! | rarity! | idolId! | addedAt!".replace(" ", "").split("|")
-                    or arg in "id | type | beginAt | id! | type! | beginAt!".replace(" ", "").split("|")):
+                if not (arg in ("id", "sortId", "rarity", "idolId", "addedAt", "id!", "sortId!", "rarity!", "idolId!", "addedAt!")
+                        or arg in ("id", "type", "beginAt", "id!", "type!", "beginAt!")):
                     log.warning(f'orderByに対応していません: {arg}')
             params[k] = str(arg)
 
@@ -127,7 +127,7 @@ class API:
                 self.cache.store(f'{path}?{urlencode(params)}', result)
 
             etag = resp.headers.get("ETag")
-            if use_etag and self.use_etag and etag:
+            if (use_etag or self.use_etag) and etag and result:
                 return {"ETag": etag, "response": result}
 
             return result
