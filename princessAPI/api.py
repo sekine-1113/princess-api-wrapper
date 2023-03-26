@@ -34,12 +34,13 @@ class API:
     ```
     """
     def __init__(
-        self, cache: Cache=None, host: str='api.matsurihi.me', lang: str=None,
+        self, cache: Cache=None, host: str='api.matsurihi.me', lang: str=None, use_etag: bool=True,
         retry_count: int=0, retry_delay: int=0, user_agent: str=None, timeout: int=60,
     ) -> None:
         self.cache = cache or StaticCache(32, 900)
         self.host = host
         self.lang = lang
+        self.use_etag = use_etag
         self.retry_count = retry_count
         self.retry_delay = retry_delay
 
@@ -57,7 +58,7 @@ class API:
 
     def request(
         self, method: str, endpoint: str, *, endpoint_parameters: tuple=(),
-        params: dict=None, headers: dict=None, use_cache: bool=True, **kwargs
+        params: dict=None, headers: dict=None, use_cache: bool=True, use_etag: bool=True, **kwargs
     ) -> requests.Response:
 
         self.cached_result = False
@@ -117,13 +118,17 @@ class API:
                 raise NotFound(resp)
             if resp.status_code >= 500:
                 raise ServerError(resp)
-            if resp.status_code and not 200 <= resp.status_code < 300:
+            if resp.status_code and resp.status_code != 304 and not 200 <= resp.status_code < 300:
                 raise HTTPException(resp)
 
             result = resp.json()
 
             if use_cache and self.cache and method == 'GET' and result:
                 self.cache.store(f'{path}?{urlencode(params)}', result)
+
+            etag = resp.headers.get("ETag")
+            if use_etag and self.use_etag and etag:
+                return {"ETag": etag, "response": result}
 
             return result
         finally:
@@ -205,58 +210,164 @@ class API:
             'GET', f'events/{event_id}/rankings/borders',
         )
 
-    def get_event_ranking_border_point(self, event_id: str) -> requests.Response:
+    def get_event_ranking_border_point(self, event_id: str, ETag: str=None) -> requests.Response:
         """Get the pt/score of the current reward boarder.
-        ETag / If-None-Match is available. (Not implemented.)
+
+        ETag / If-None-Match is available.
+
+        Optional Parameters
+        -------------------
+        ETag: str
+            example.) "a3ac39e6fe30e22df7544cfd818edc02"
+
+        Returns
+        -------
+        Using ETag
+
+        dict -> {
+            "ETag": "~~~",
+            "response": object,
+        }
         """
+        headers = {}
+        use_etag = False
+        if ETag:
+            headers["If-None-Match"] = ETag
+            use_etag = True
         return self.request(
             'GET', f'events/{event_id}/rankings/borderPoints',
+            headers=headers,
+            use_etag=use_etag,
         )
 
-    def get_event_ranking_summary(self, event_id: str, event_type: str) -> requests.Response:
-        """Obtains aggregate ranking information."""
+    def get_event_ranking_summary(self, event_id: str, event_type: str, ETag: str=None) -> requests.Response:
+        """Obtains aggregate ranking information.
+
+        ETag / If-None-Match is available.
+
+        Optional Parameters
+        -------------------
+        ETag: str
+            example.) "a3ac39e6fe30e22df7544cfd818edc02"
+
+        Returns
+        -------
+        Using ETag
+
+        dict -> {
+            "ETag": "~~~",
+            "response": object,
+        }
+        """
+        headers = {}
+        use_etag = False
+        if ETag:
+            headers["If-None-Match"] = ETag
+            use_etag = True
         return self.request(
             'GET', f'events/{event_id}/rankings/{event_type}/summaries',
+            headers=headers,
+            use_etag=use_etag,
         )
 
-    def get_event_idol_point_ranking_summary(self, event_id: str, idol_id: str, **kwargs) -> requests.Response:
+    def get_event_idol_point_ranking_summary(self, event_id: str, idol_id: str, ETag: str=None, **kwargs) -> requests.Response:
         """Obtains aggregate information on rankings by idol.
+
+        ETag / If-None-Match is available.
 
         Optional Parameters
         -------------------
         all: bool
+        ETag: str
+            example.) "a3ac39e6fe30e22df7544cfd818edc02"
+
+        Returns
+        -------
+        Using ETag
+
+        dict -> {
+            "ETag": "~~~",
+            "response": object,
+        }
         """
+        headers = {}
+        use_etag = False
+        if ETag:
+            headers["If-None-Match"] = ETag
+            use_etag = True
         return self.request(
             'GET', f'events/{event_id}/rankings/idolPoint/{idol_id}/summaries',
             endpoint_parameters=('all',),
+            headers=headers,
+            use_etag=use_etag,
             **kwargs,
         )
 
-    def get_event_ranking_log(self, event_id: str, event_type: str, ranks: str, **kwargs) -> requests.Response:
+    def get_event_ranking_log(self, event_id: str, event_type: str, ranks: str, ETag: str=None, **kwargs) -> requests.Response:
         """Log the ranking against the order.
+
+        ETag / If-None-Match is available.
 
         Optional Parameters
         -------------------
         since: datetime
+        ETag: str
+            example.) "a3ac39e6fe30e22df7544cfd818edc02"
+
+        Returns
+        -------
+        Using ETag
+
+        dict -> {
+            "ETag": "~~~",
+            "response": object,
+        }
 
         """
+        headers = {}
+        use_etag = False
+        if ETag:
+            headers["If-None-Match"] = ETag
+            use_etag = True
         return self.request(
             'GET', f'events/{event_id}/rankings/{event_type}/logs/{ranks}',
             endpoint_parameters=('since',),
+            headers=headers,
+            use_etag=use_etag,
             **kwargs,
         )
 
-    def get_event_ranking_log_by_idol(self, event_id: str, idol_id: str, ranks: str, **kwargs) -> requests.Response:
+    def get_event_ranking_log_by_idol(self, event_id: str, idol_id: str, ranks: str, ETag: str=None, **kwargs) -> requests.Response:
         """Log the ranking by idol against the rank.
+
+        ETag / If-None-Match is available.
 
         Optional Parameters
         -------------------
         since: datetime
         all: bool
+        ETag: str
+            example.) "a3ac39e6fe30e22df7544cfd818edc02"
+
+        Returns
+        -------
+        Using ETag
+
+        dict -> {
+            "ETag": "~~~",
+            "response": object,
+        }
         """
+        headers = {}
+        use_etag = False
+        if ETag:
+            headers["If-None-Match"] = ETag
+            use_etag = True
         return self.request(
             'GET', f'events/{event_id}/rankings/idolPoint/{idol_id}/logs/{ranks}',
             endpoint_parameters=('since', 'all',),
+            headers=headers,
+            use_etag=use_etag,
             **kwargs,
         )
 
