@@ -11,6 +11,7 @@ from exceptions import (
     BadRequest,
     HTTPException,
     NotFound,
+    TooManyRequests,
     PrincessException,
     ServerError,
 )
@@ -98,7 +99,7 @@ class API:
             retries_performed = 0
             while retries_performed <= self.retry_count:
                 try:
-                    resp = self.session.request(
+                    resp: requests.Response = self.session.request(
                         method, url, params=params, headers=headers,
                         timeout=self.timeout
                     )
@@ -116,6 +117,8 @@ class API:
                 raise BadRequest(resp)
             if resp.status_code == 404:
                 raise NotFound(resp)
+            if resp.status_code == 429:
+                raise TooManyRequests(resp)
             if resp.status_code >= 500:
                 raise ServerError(resp)
             if resp.status_code and resp.status_code != 304 and not 200 <= resp.status_code < 300:

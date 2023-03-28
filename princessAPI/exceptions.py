@@ -31,6 +31,10 @@ class NotFound(HTTPException):
     pass
 
 
+class TooManyRequests(HTTPException):
+    pass
+
+
 class ServerError(HTTPException):
     pass
 

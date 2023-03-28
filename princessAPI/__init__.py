@@ -1,9 +1,9 @@
-__version__ = "2.0.0"
+# princessAPI
+# Copyright 2023
+# See LICEENSE for details.
 
-import sys
-import os
-sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+__version__ = "2.0.0"
+__license__ = "MIT"
 
 from princessAPI.api import API
 from princessAPI.consts import (
@@ -13,3 +13,5 @@ from princessAPI.consts import (
     ExType,
     EventType,
 )
+# Global
+api = API()
