@@ -13,5 +13,10 @@ from princessAPI.consts import (
     ExType,
     EventType,
 )
+from princessAPI.exceptions import (
+    PrincessException,
+    HTTPException,
+    ServerError,
+)
 # Global
 api = API()
