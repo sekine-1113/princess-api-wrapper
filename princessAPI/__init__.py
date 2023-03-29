@@ -16,6 +16,9 @@ from princessAPI.consts import (
 from princessAPI.exceptions import (
     PrincessException,
     HTTPException,
+    BadRequest,
+    NotFound,
+    TooManyRequests,
     ServerError,
 )
 # Global
