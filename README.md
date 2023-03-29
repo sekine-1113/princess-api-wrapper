@@ -4,6 +4,11 @@
 
 This is a [Princess API](https://api.matsurihi.me/docs/) wrapper for Python!
 
+# インストール, how to install
+
+`pip install git+https://github.com/sekine-1113/princess-api-wrapper.git`
+
+
 # 使用例, Example
 
 ```python
